@@ -1,0 +1,11 @@
+enum Role {
+    REQUESTER
+    DISPATCHER
+    ADMIN
+}
+
+enum UserStatus {
+    ACTIVE
+    INACTIVE
+    SUSPENDED
+}
