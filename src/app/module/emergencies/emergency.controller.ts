@@ -60,10 +60,10 @@ const getEmergencyById = catchAsync(async (req: Request, res: Response) => {
 const updateEmergency = catchAsync(async (req: Request, res: Response) => {
 	const emergencyId = req.params.id;
 	const payload = req.body;
-    const userId = req.user?.userId;
+	const userId = req.user?.userId;
 	const result = await emergencyService.updateEmergency(
 		emergencyId as string,
-        userId as string,
+		userId as string,
 		payload,
 	);
 
@@ -78,8 +78,11 @@ const updateEmergency = catchAsync(async (req: Request, res: Response) => {
 
 const cancelEmergency = catchAsync(async (req: Request, res: Response) => {
 	const emergencyId = req.params.id;
-    const user = req.user;
-	const result = await emergencyService.cancelEmergency(emergencyId as string ,user as IRequestUser);
+	const user = req.user;
+	const result = await emergencyService.cancelEmergency(
+		emergencyId as string,
+		user as IRequestUser,
+	);
 
 	sendResponse(res, {
 		statusCode: 200,
