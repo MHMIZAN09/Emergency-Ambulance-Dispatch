@@ -6,7 +6,7 @@ import { hospitalService } from "./hospital.service";
 const createHospital = catchAsync(async (req: Request, res: Response) => {
 	const payload = req.body;
 
-	const emergency = await hospitalService.createHospital(payload );
+	const emergency = await hospitalService.createHospital(payload);
 
 	sendResponse(res, {
 		statusCode: 201,
@@ -49,7 +49,10 @@ const updateHospital = catchAsync(async (req: Request, res: Response) => {
 	const hospitalId = req.params.id;
 	const payload = req.body;
 
-	const hospital = await hospitalService.updateHospital(hospitalId as string, payload);
+	const hospital = await hospitalService.updateHospital(
+		hospitalId as string,
+		payload,
+	);
 
 	sendResponse(res, {
 		statusCode: 200,

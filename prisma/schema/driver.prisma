@@ -1,5 +1,5 @@
 model Driver {
-    id            Int    @id @default(autoincrement())
+    id            String @id @default(uuid())
     name          String
     email         String @unique
     phone         String @unique
@@ -12,5 +12,6 @@ model Driver {
     createdAt DateTime  @default(now())
     updatedAt DateTime  @updatedAt
 
+    @@index([email])
     @@map("drivers")
 }

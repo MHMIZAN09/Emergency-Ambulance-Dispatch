@@ -1,6 +1,9 @@
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
-import { IHospitalPayload, IHospitalUpdatePayload } from "./hospital.interface";
+import type {
+	IHospitalPayload,
+	IHospitalUpdatePayload,
+} from "./hospital.interface";
 
 const createHospital = async (payload: IHospitalPayload) => {
 	const { name, address, phone, email, latitude, longitude, status } = payload;
@@ -102,45 +105,37 @@ const updateHospital = async (
 	return updatedHospital;
 };
 
-
 const deleteHospital = async (hospitalId: string) => {
-    const hospital = await prisma.hospital.findFirst({
-        where: {
-            id: hospitalId,
-            deletedAt: null,
-        },
-    });
+	const hospital = await prisma.hospital.findFirst({
+		where: {
+			id: hospitalId,
+			deletedAt: null,
+		},
+	});
 
-    if (!hospital) {
-        throw new AppError(404, "Hospital not found");
-    }
-    
+	if (!hospital) {
+		throw new AppError(404, "Hospital not found");
+	}
+
 	const deletedHospital = await prisma.hospital.updateMany({
-        where: {
-            id: hospitalId,
-            deletedAt: null,
-        },
-        data: {
-            deletedAt: new Date(),
-        },
-    });
+		where: {
+			id: hospitalId,
+			deletedAt: null,
+		},
+		data: {
+			deletedAt: new Date(),
+		},
+	});
 
-    if (deletedHospital.count === 0) {
-        throw new AppError(404, "Hospital not found or already deleted");
-    }
-
+	if (deletedHospital.count === 0) {
+		throw new AppError(404, "Hospital not found or already deleted");
+	}
 
 	return deletedHospital;
-}
+};
 
-
-
-
-//! Get nearby hospitals after completed all module then fix this 
+//! Get nearby hospitals after completed all module then fix this
 const getNearbyHospitals = async () => {};
-
-
-
 
 export const hospitalService = {
 	createHospital,
@@ -148,5 +143,5 @@ export const hospitalService = {
 	getHospitalById,
 	updateHospital,
 	deleteHospital,
-    getNearbyHospitals,
+	getNearbyHospitals,
 };

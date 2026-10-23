@@ -11,8 +11,8 @@ model Ambulance {
     latitude  Float?
     longitude Float?
 
-    baseFare  Decimal @db.Decimal(12, 2)
-    perKmFare Decimal @db.Decimal(12, 2)
+    baseFare  Decimal @db.Decimal(10, 2)
+    perKmFare Decimal @db.Decimal(10, 2)
 
     lastLocationAt DateTime?
     deletedAt      DateTime?
