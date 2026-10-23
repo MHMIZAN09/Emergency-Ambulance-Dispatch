@@ -20,9 +20,11 @@ model EmergencyRequest {
     completedAt DateTime?
 
     dispatches Dispatch?
-    deletedAt  DateTime?
-    createdAt  DateTime  @default(now())
-    updatedAt  DateTime  @updatedAt
+    payments   Payment[]
+
+    deletedAt DateTime?
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
 
     @@index([userId, status, deletedAt])
     @@map("emergency_requests")

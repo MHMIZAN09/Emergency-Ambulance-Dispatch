@@ -39,4 +39,4 @@ router.get(
 router.patch("/:id", auth(Role.ADMIN), ambulanceController.updateAmbulance);
 router.delete("/:id", auth(Role.ADMIN), ambulanceController.deleteAmbulance);
 
-export const ambulanceRoute = router;
+export const ambulanceRouter = router;

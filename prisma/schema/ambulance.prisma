@@ -8,6 +8,9 @@ model Ambulance {
     capacity     Int
     status       AmbulanceStatus @default(OFFLINE)
 
+    imageUrl      String?
+    imagePublicId String?
+
     latitude  Float?
     longitude Float?
 

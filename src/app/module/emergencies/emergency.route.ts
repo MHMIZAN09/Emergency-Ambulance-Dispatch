@@ -41,4 +41,4 @@ router.patch(
 	emergencyController.assignHospital,
 );
 
-export const EmergencyRoute = router;
+export const emergencyRouter = router;

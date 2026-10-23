@@ -1,8 +1,37 @@
 model Payment {
-    id String @id @default(uuid())
+    id          String           @id @default(uuid())
+    emergencyId String
+    emergency   EmergencyRequest @relation(fields: [emergencyId], references: [id])
+
+    amount   Decimal @db.Decimal(10, 2)
+    currency String  @default("BDT")
+
+    status  PaymentStatus  @default(UNPAID)
+    gateway PaymentGateway
+
+    merchantInvoiceNumber String @unique
+
+    gatewayPaymentId     String? @unique
+    gatewayTransactionId String? @unique
+    gatewayValidationId  String? @unique
+
+    payerReference String?
+
+    paidAt      DateTime?
+    failedAt    DateTime?
+    cancelledAt DateTime?
+
+    refundTrxId  String?
+    refundAmount Decimal?  @db.Decimal(12, 2)
+    refundReason String?
+    refundedAt   DateTime?
+
+    gatewayResponse Json?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
+    @@index([emergencyId, status])
+    @@index([status, createdAt])
     @@map("payments")
 }

@@ -5,6 +5,9 @@ model Driver {
     phone         String @unique
     licenseNumber String @unique
 
+    imageUrl      String?
+    imagePublicId String?
+
     ambulanceId String?    @unique
     ambulance   Ambulance? @relation(fields: [ambulanceId], references: [id])
 

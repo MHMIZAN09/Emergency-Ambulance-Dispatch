@@ -1,9 +1,12 @@
 model User {
-    id                 String     @id @default(uuid(7))
-    name               String
-    email              String     @unique
-    password           String
-    phone              String?
+    id       String  @id @default(uuid(7))
+    name     String
+    email    String  @unique
+    password String
+    phone    String?
+
+    imageUrl           String?
+    imagePublicId      String?
     role               Role       @default(REQUESTER)
     status             UserStatus @default(ACTIVE)
     emailVerified      Boolean    @default(false)

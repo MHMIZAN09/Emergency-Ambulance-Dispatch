@@ -54,8 +54,8 @@ enum DispatchStatus {
 }
 
 enum PaymentStatus {
-    PENDING
-    SUCCESS
+    UNPAID
+    PAID
     FAILED
     CANCELLED
     REFUNDED
@@ -63,8 +63,8 @@ enum PaymentStatus {
 
 enum PaymentGateway {
     SSLCOMMERZ
-    STRIPE
     BKASH
+    STRIPE
 }
 
 enum HospitalStatus {
