@@ -5,3 +5,14 @@ export interface IDriverPayload {
 	licenseNumber: string;
 	ambulanceId?: string;
 }
+
+export interface IDriverUpdatePayload {
+	name?: string;
+	email?: string;
+	phone?: string;
+	ambulanceId?: string;
+}
+
+export interface IDriverAmbulancePayload {
+	ambulanceId: string;
+}
