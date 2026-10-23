@@ -1,0 +1,16 @@
+model Driver {
+    id            Int    @id @default(autoincrement())
+    name          String
+    email         String @unique
+    phone         String @unique
+    licenseNumber String @unique
+
+    ambulanceId String?    @unique
+    ambulance   Ambulance? @relation(fields: [ambulanceId], references: [id])
+
+    deletedAt DateTime?
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+
+    @@map("drivers")
+}

@@ -1,19 +1,21 @@
 model User {
-    id               String     @id @default(uuid(7))
-    name             String
-    email            String     @unique
-    password         String
-    phone            String?
-    role             Role       @default(REQUESTER)
-    status           UserStatus @default(ACTIVE)
-    emailVerified    Boolean    @default(false)
-    lastLoginAt      DateTime?  @default(now())
-    mustChangePassword  Boolean    @default(false)
+    id                 String     @id @default(uuid(7))
+    name               String
+    email              String     @unique
+    password           String
+    phone              String?
+    role               Role       @default(REQUESTER)
+    status             UserStatus @default(ACTIVE)
+    emailVerified      Boolean    @default(false)
+    lastLoginAt        DateTime?  @default(now())
+    mustChangePassword Boolean    @default(false)
 
-    isDeleted Boolean   @default(false)
-    deletedAt DateTime?
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
+    isDeleted         Boolean            @default(false)
+    deletedAt         DateTime?
+    createdAt         DateTime           @default(now())
+    updatedAt         DateTime           @updatedAt
+    emergencyRequests EmergencyRequest[]
+    dispatches        Dispatch[]         @relation("DispatcherAssignments")
 
     @@index([email, phone], name: "user_email_phone_index")
     @@map("users")

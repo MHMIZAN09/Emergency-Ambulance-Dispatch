@@ -8,23 +8,25 @@ import { UserValidation } from "./auth.validation";
 const router = Router();
 
 router.post(
-  "/register",
-  validateRequest(UserValidation.RegistrationZodSchema),
-  AuthController.registerUser,
+	"/register",
+	validateRequest(UserValidation.RegistrationZodSchema),
+	AuthController.registerUser,
 );
 
 router.post(
-  "/login",
-  validateRequest(UserValidation.LoginZodSchema),
-  AuthController.loginUser,
+	"/login",
+	validateRequest(UserValidation.LoginZodSchema),
+	AuthController.loginUser,
 );
 
 router.get(
-  "/me",
-  auth(Role.ADMIN, Role.DISPATCHER, Role.REQUESTER),
-  AuthController.getMe,
+	"/me",
+	auth(Role.ADMIN, Role.DISPATCHER, Role.REQUESTER),
+	AuthController.getMe,
 );
 
 router.post("/refresh-token", AuthController.refreshToken);
+
+router.post("/logout", AuthController.logout);
 
 export const authRouter = router;

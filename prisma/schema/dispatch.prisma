@@ -1,0 +1,25 @@
+model Dispatch {
+    id String @id @default(uuid())
+
+    emergencyId  String           @unique
+    emergency    EmergencyRequest @relation(fields: [emergencyId], references: [id])
+    ambulanceId  String
+    ambulance    Ambulance        @relation(fields: [ambulanceId], references: [id])
+    assignedById String
+    assignedBy   User             @relation("DispatcherAssignments", fields: [assignedById], references: [id])
+
+    status      DispatchStatus @default(ASSIGNED)
+    assignedAt  DateTime       @default(now())
+    enRouteAt   DateTime?
+    pickedUpAt  DateTime?
+    arrivedAt   DateTime?
+    completedAt DateTime?
+    cancelledAt DateTime?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([emergencyId, ambulanceId, status])
+    @@index([assignedById])
+    @@map("dispatches")
+}

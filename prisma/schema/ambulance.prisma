@@ -1,0 +1,28 @@
+model Ambulance {
+    id           String          @id @default(uuid())
+    licensePlate String          @unique
+    model        String
+    manufacturer String?
+    year         Int?
+    type         AmbulanceType
+    capacity     Int
+    status       AmbulanceStatus @default(OFFLINE)
+
+    latitude  Float?
+    longitude Float?
+
+    baseFare  Decimal @db.Decimal(12, 2)
+    perKmFare Decimal @db.Decimal(12, 2)
+
+    lastLocationAt DateTime?
+    deletedAt      DateTime?
+    createdAt      DateTime  @default(now())
+    updatedAt      DateTime  @updatedAt
+
+    drivers    Driver?
+    dispatches Dispatch[]
+
+    @@index([status, deletedAt])
+    @@index([type, status])
+    @@map("ambulances")
+}

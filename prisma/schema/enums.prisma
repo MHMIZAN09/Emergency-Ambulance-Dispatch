@@ -9,3 +9,77 @@ enum UserStatus {
     INACTIVE
     SUSPENDED
 }
+
+enum AmbulanceStatus {
+    AVAILABLE
+    BUSY
+    OFFLINE
+    MAINTENANCE
+}
+
+enum AmbulanceType {
+    BASIC
+    ADVANCED_LIFE_SUPPORT
+    NEONATAL
+    PATIENT_TRANSPORT
+    FREEZER
+    AIR_AMBULANCE
+}
+
+enum EmergencyPriority {
+    LOW
+    MEDIUM
+    HIGH
+    CRITICAL
+}
+
+enum EmergencyStatus {
+    REQUESTED
+    VERIFIED
+    ASSIGNED
+    EN_ROUTE
+    PICKED_UP
+    AT_HOSPITAL
+    COMPLETED
+    CANCELLED
+}
+
+enum DispatchStatus {
+    ASSIGNED
+    EN_ROUTE
+    PICKED_UP
+    AT_HOSPITAL
+    COMPLETED
+    CANCELLED
+}
+
+enum PaymentStatus {
+    PENDING
+    SUCCESS
+    FAILED
+    CANCELLED
+    REFUNDED
+}
+
+enum PaymentGateway {
+    SSLCOMMERZ
+    STRIPE
+    BKASH
+}
+
+enum HospitalStatus {
+    OPEN
+    CLOSED
+    MAINTENANCE
+}
+
+enum BloodGroup {
+    A_POSITIVE
+    A_NEGATIVE
+    B_POSITIVE
+    B_NEGATIVE
+    AB_POSITIVE
+    AB_NEGATIVE
+    O_POSITIVE
+    O_NEGATIVE
+}

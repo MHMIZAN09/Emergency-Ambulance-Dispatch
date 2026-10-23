@@ -1,0 +1,18 @@
+model Hospital {
+    id        String         @id @default(uuid())
+    name      String
+    address   String
+    phone     String         @unique
+    email     String         @unique
+    latitude  Float?
+    longitude Float?
+    status    HospitalStatus @default(OPEN)
+    deletedAt DateTime?
+    createdAt DateTime       @default(now())
+    updatedAt DateTime       @updatedAt
+
+    @@index([name])
+    @@index([status, deletedAt])
+    @@map("hospitals")
+    emergencyRequests EmergencyRequest[]
+}
