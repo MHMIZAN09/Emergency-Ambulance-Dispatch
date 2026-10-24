@@ -6,7 +6,10 @@ import { dispatchService } from "./dispatch.service";
 const createDispatch = catchAsync(async (req: Request, res: Response) => {
 	const payload = req.body;
 
-	const dispatch = await dispatchService.createDispatch(payload);
+	const dispatch = await dispatchService.createDispatch(
+		payload,
+		req.user?.userId as string,
+	);
 
 	sendResponse(res, {
 		statusCode: 201,

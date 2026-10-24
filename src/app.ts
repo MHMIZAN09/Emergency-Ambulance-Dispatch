@@ -6,9 +6,9 @@ import express, {
 	type Response,
 } from "express";
 import httpStatus from "http-status";
-import { appRouter } from "./app/routes";
-import { notFound } from "./app/middleware/notFound";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
+import { notFound } from "./app/middleware/notFound";
+import { appRouter } from "./app/routes";
 
 const app: Application = express();
 
@@ -16,7 +16,7 @@ app.use(
 	cors({
 		origin: "*", // Allow requests from any origin
 		credentials: true, // Allow credentials (cookies, authorization headers, etc.)
-		methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // Allowed HTTP methods
+		// methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // Allowed HTTP methods
 	}),
 );
 

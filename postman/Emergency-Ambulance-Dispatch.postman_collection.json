@@ -1,0 +1,116 @@
+{
+	"info": {
+		"_postman_id": "aeb2f6a4-9e87-4c7b-a3da-6d7f8b9a2f10",
+		"name": "Emergency Ambulance Dispatch API",
+		"description": "API smoke and workflow requests for every registered endpoint. Set role-specific credentials in the collection variables before running protected requests.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{ "key": "baseUrl", "value": "http://localhost:5000/api/v1" },
+		{ "key": "accessToken", "value": "" },
+		{ "key": "refreshToken", "value": "" },
+		{ "key": "userId", "value": "" },
+		{ "key": "ambulanceId", "value": "" },
+		{ "key": "emergencyId", "value": "" },
+		{ "key": "dispatchId", "value": "" },
+		{ "key": "driverId", "value": "" },
+		{ "key": "hospitalId", "value": "" }
+	],
+	"event": [
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"pm.test('HTTP status is successful', function () { pm.expect(pm.response.code).to.be.within(200, 299); });",
+					"let body; try { body = pm.response.json(); } catch (_) { return; }",
+					"const data = body && body.data;",
+					"if (data && data.id) {",
+					"  const names = { userId: 'userId', ambulanceId: 'ambulanceId', emergencyId: 'emergencyId', dispatchId: 'dispatchId', driverId: 'driverId', hospitalId: 'hospitalId' };",
+					"  Object.keys(names).forEach(function (key) { if (data.id && pm.request.url.toString().toLowerCase().includes(key.replace('Id', ''))) pm.collectionVariables.set(names[key], data.id); });",
+					"}",
+					"if (data && data.id && pm.info.requestName === 'Register requester') pm.collectionVariables.set('userId', data.id);",
+					"if (body && body.data && body.data.accessToken) pm.collectionVariables.set('accessToken', body.data.accessToken);",
+					"if (body && body.data && body.data.refreshToken) pm.collectionVariables.set('refreshToken', body.data.refreshToken);"
+				]
+			}
+		}
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{ "name": "Register requester", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Test Requester\",\n  \"email\": \"requester@example.com\",\n  \"password\": \"Password@123\",\n  \"phone\": \"01712345678\"\n}" }, "url": "{{baseUrl}}/auth/register" } },
+				{ "name": "Login", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"requester@example.com\",\n  \"password\": \"Password@123\"\n}" }, "url": "{{baseUrl}}/auth/login" } },
+				{ "name": "Get current user", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/auth/me" } },
+				{ "name": "Refresh token", "request": { "method": "POST", "header": [{ "key": "Cookie", "value": "refreshToken={{refreshToken}}" }], "url": "{{baseUrl}}/auth/refresh-token" } },
+				{ "name": "Logout", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/auth/logout" } }
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{ "name": "Update user", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"name\": \"Updated Requester\" }" }, "url": "{{baseUrl}}/user/update/{{userId}}" } },
+				{ "name": "Admin list users", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/user/admin/all" } }
+			]
+		},
+		{
+			"name": "Ambulances",
+			"item": [
+				{ "name": "Create ambulance", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"licensePlate\": \"DHAKA-TEST-001\", \"model\": \"Transit\", \"manufacturer\": \"Ford\", \"year\": 2024, \"type\": \"BASIC\", \"capacity\": 2, \"status\": \"AVAILABLE\", \"latitude\": 23.8103, \"longitude\": 90.4125, \"baseFare\": \"500.00\", \"perKmFare\": \"30.00\" }" }, "url": "{{baseUrl}}/ambulance" } },
+				{ "name": "List ambulances", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/ambulance" } },
+				{ "name": "List available ambulances", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/ambulance/available" } },
+				{ "name": "Get ambulance", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/ambulance/{{ambulanceId}}" } },
+				{ "name": "Update ambulance", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"model\": \"Transit Updated\", \"capacity\": 3 }" }, "url": "{{baseUrl}}/ambulance/{{ambulanceId}}" } },
+				{ "name": "Update ambulance status", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"status\": \"OFFLINE\" }" }, "url": "{{baseUrl}}/ambulance/{{ambulanceId}}/status" } },
+				{ "name": "Update ambulance location", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"latitude\": 23.81, \"longitude\": 90.41 }" }, "url": "{{baseUrl}}/ambulance/{{ambulanceId}}/location" } },
+				{ "name": "Delete ambulance", "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/ambulance/{{ambulanceId}}" } }
+			]
+		},
+		{
+			"name": "Emergencies",
+			"item": [
+				{ "name": "Create emergency", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"patientName\": \"Test Patient\", \"patientAge\": 35, \"description\": \"Medical emergency\", \"priority\": \"HIGH\", \"pickupAddress\": \"Dhaka, Bangladesh\", \"pickupLat\": 23.8103, \"pickupLng\": 90.4125 }" }, "url": "{{baseUrl}}/emergency" } },
+				{ "name": "List my emergencies", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/emergency/my" } },
+				{ "name": "List all emergencies", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/emergency/all" } },
+				{ "name": "Get emergency", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/emergency/{{emergencyId}}" } },
+				{ "name": "Update emergency", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"description\": \"Updated emergency details\" }" }, "url": "{{baseUrl}}/emergency/{{emergencyId}}" } },
+				{ "name": "Verify emergency", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/emergency/{{emergencyId}}/verify" } },
+				{ "name": "Assign hospital to emergency", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"hospitalId\": \"{{hospitalId}}\" }" }, "url": "{{baseUrl}}/emergency/{{emergencyId}}/hospital" } },
+				{ "name": "Cancel emergency", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/emergency/{{emergencyId}}/cancel" } }
+			]
+		},
+		{
+			"name": "Dispatches",
+			"item": [
+				{ "name": "Create dispatch", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"emergencyId\": \"{{emergencyId}}\", \"ambulanceId\": \"{{ambulanceId}}\" }" }, "url": "{{baseUrl}}/dispatch" } },
+				{ "name": "List dispatches", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/dispatch" } },
+				{ "name": "Get dispatch", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/dispatch/{{dispatchId}}" } },
+				{ "name": "Update dispatch status", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"status\": \"EN_ROUTE\" }" }, "url": "{{baseUrl}}/dispatch/{{dispatchId}}/status" } },
+				{ "name": "Cancel dispatch", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"reason\": \"Test cancellation\" }" }, "url": "{{baseUrl}}/dispatch/{{dispatchId}}/cancel" } }
+			]
+		},
+		{
+			"name": "Drivers",
+			"item": [
+				{ "name": "Create driver", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"name\": \"Test Driver\", \"email\": \"driver@example.com\", \"phone\": \"01712345679\", \"licenseNumber\": \"DL-TEST-001\" }" }, "url": "{{baseUrl}}/driver" } },
+				{ "name": "List drivers", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/driver" } },
+				{ "name": "Get driver", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/driver/{{driverId}}" } },
+				{ "name": "Update driver", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"name\": \"Updated Driver\" }" }, "url": "{{baseUrl}}/driver/{{driverId}}" } },
+				{ "name": "Assign ambulance to driver", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"ambulanceId\": \"{{ambulanceId}}\" }" }, "url": "{{baseUrl}}/driver/{{driverId}}/ambulance" } },
+				{ "name": "Delete driver", "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/driver/{{driverId}}" } }
+			]
+		},
+		{
+			"name": "Hospitals",
+			"item": [
+				{ "name": "Create hospital", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"name\": \"Test Hospital\", \"address\": \"Dhaka, Bangladesh\", \"phone\": \"01712345680\", \"email\": \"hospital@example.com\", \"latitude\": 23.81, \"longitude\": 90.41 }" }, "url": "{{baseUrl}}/hospital" } },
+				{ "name": "List hospitals", "request": { "method": "GET", "url": "{{baseUrl}}/hospital" } },
+				{ "name": "List nearby hospitals", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/hospital/nearby?latitude=23.8103&longitude=90.4125&radius=10" } },
+				{ "name": "Get hospital", "request": { "method": "GET", "url": "{{baseUrl}}/hospital/{{hospitalId}}" } },
+				{ "name": "Update hospital", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"status\": \"OPEN\" }" }, "url": "{{baseUrl}}/hospital/{{hospitalId}}" } },
+				{ "name": "Delete hospital", "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/hospital/{{hospitalId}}" } }
+			]
+		}
+	]
+}

@@ -131,29 +131,27 @@ const updateAmbulance = async (
 				"Ambulance with this license plate already exists",
 			);
 		}
-
-		const updatedAmbulance = await prisma.ambulance.update({
-			where: {
-				id: ambulanceId,
-			},
-			data: {
-				licensePlate: payload.licensePlate,
-				model: payload.model,
-				manufacturer: payload.manufacturer,
-				year: payload.year,
-				type: payload.type as AmbulanceType,
-				capacity: payload.capacity,
-				status: payload.status as AmbulanceStatus,
-				latitude: payload.latitude,
-				longitude: payload.longitude,
-				baseFare: payload.baseFare,
-				perKmFare: payload.perKmFare,
-				updatedAt: new Date(),
-			},
-		});
-
-		return updatedAmbulance;
 	}
+
+	return prisma.ambulance.update({
+		where: {
+			id: ambulanceId,
+		},
+		data: {
+			licensePlate: payload.licensePlate,
+			model: payload.model,
+			manufacturer: payload.manufacturer,
+			year: payload.year,
+			type: payload.type as AmbulanceType,
+			capacity: payload.capacity,
+			status: payload.status as AmbulanceStatus,
+			latitude: payload.latitude,
+			longitude: payload.longitude,
+			baseFare: payload.baseFare,
+			perKmFare: payload.perKmFare,
+			updatedAt: new Date(),
+		},
+	});
 };
 
 const updateAmbulanceStatus = async (

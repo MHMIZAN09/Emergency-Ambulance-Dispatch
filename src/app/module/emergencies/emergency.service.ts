@@ -63,6 +63,7 @@ const getMyEmergencies = async (userId: string) => {
 	const user = await prisma.user.findUnique({
 		where: {
 			id: userId,
+			deletedAt: null,
 		},
 	});
 
@@ -88,6 +89,16 @@ const getMyEmergencies = async (userId: string) => {
 		where: {
 			userId: user.id,
 		},
+		include: {
+			dispatches: true,
+			hospital: true,
+			user: {
+				omit: {
+					password: true,
+				},
+			},
+			payments: true,
+		},
 	});
 
 	return emergencies;
@@ -95,7 +106,24 @@ const getMyEmergencies = async (userId: string) => {
 
 //! Todo : limit, pagination, sorting, filtering pending
 const getAllEmergencies = async () => {
-	const emergencies = await prisma.emergencyRequest.findMany();
+	const emergencies = await prisma.emergencyRequest.findMany({
+		where: {
+			deletedAt: null,
+		},
+		include: {
+			dispatches: true,
+			hospital: true,
+			user: {
+				omit: {
+					password: true,
+				},
+			},
+			payments: true,
+		},
+		orderBy: {
+			createdAt: "desc",
+		},
+	});
 	return emergencies;
 };
 
@@ -106,9 +134,14 @@ const getEmergencyById = async (emergencyId: string) => {
 			deletedAt: null,
 		},
 		include: {
-			user: true,
+			user: {
+				omit: {
+					password: true,
+				},
+			},
 			hospital: true,
 			dispatches: true,
+			payments: true,
 		},
 	});
 
@@ -146,7 +179,6 @@ const updateEmergency = async (
 	const updatedEmergency = await prisma.emergencyRequest.updateMany({
 		where: {
 			id: emergencyId,
-			userId: userId,
 			status: "REQUESTED",
 			deletedAt: null,
 		},
@@ -172,50 +204,115 @@ const updateEmergency = async (
 
 //* Cancel Emergency
 const cancelEmergency = async (emergencyId: string, user: IRequestUser) => {
-	const emergency = await prisma.emergencyRequest.findFirst({
-		where: {
-			id: emergencyId,
-			deletedAt: null,
-		},
+	const result = await prisma.$transaction(async (tx) => {
+		const emergency = await tx.emergencyRequest.findFirst({
+			where: {
+				id: emergencyId,
+				deletedAt: null,
+			},
+			include: {
+				dispatches: true,
+			},
+		});
+
+		if (!emergency) {
+			throw new AppError(404, "Emergency not found");
+		}
+		if (user.role === Role.REQUESTER && emergency.userId !== user.userId) {
+			throw new AppError(403, "You are not allowed to cancel this emergency");
+		}
+
+		if (![Role.REQUESTER, Role.DISPATCHER, Role.ADMIN].includes(user.role)) {
+			throw new AppError(403, "Permission denied");
+		}
+
+		if (emergency.status === "CANCELLED") {
+			throw new AppError(409, "Emergency is already cancelled");
+		}
+
+		if (emergency.status === "COMPLETED") {
+			throw new AppError(409, "Completed emergencies cannot be cancelled");
+		}
+
+		if (emergency.status === "AT_HOSPITAL") {
+			throw new AppError(
+				409,
+				"Emergencies that have reached the hospital cannot be cancelled",
+			);
+		}
+
+		const emergencyUpdate = await tx.emergencyRequest.updateMany({
+			where: {
+				id: emergency.id,
+				status: emergency.status,
+				deletedAt: null,
+			},
+			data: {
+				status: "CANCELLED",
+				cancelledAt: new Date(),
+			},
+		});
+
+		if (emergencyUpdate.count === 0) {
+			throw new AppError(409, "Emergency status changed. Please try again");
+		}
+
+		if (emergency.dispatches && emergency.dispatches.status !== "CANCELLED") {
+			if (emergency.dispatches.status === "COMPLETED") {
+				throw new AppError(
+					409,
+					"Cannot cancel emergency with completed dispatch",
+				);
+			}
+		}
+
+		const dispatchUpdate = await tx.dispatch.updateMany({
+			where: {
+				id: emergency.dispatches?.id,
+				status: emergency.dispatches?.status,
+			},
+			data: {
+				status: "CANCELLED",
+				cancelledAt: new Date(),
+			},
+		});
+
+		if (dispatchUpdate.count === 0) {
+			throw new AppError(409, "Dispatch status changed. Please try again");
+		}
+
+		const activeDispatch = await tx.dispatch.findFirst({
+			where: {
+				ambulanceId: emergency.dispatches?.ambulanceId,
+				id: { not: emergency.dispatches?.id },
+				status: {
+					notIn: ["COMPLETED", "CANCELLED"],
+				},
+			},
+			select: { id: true },
+		});
+
+		if (!activeDispatch) {
+			await tx.ambulance.update({
+				where: { id: emergency.dispatches?.ambulanceId },
+				data: { status: "AVAILABLE" },
+			});
+		}
+
+		return tx.emergencyRequest.findFirstOrThrow({
+			where: {
+				id: emergencyId,
+				deletedAt: null,
+			},
+			include: {
+				hospital: true,
+				dispatches: true,
+				payments: true,
+			},
+		});
 	});
 
-	if (!emergency) {
-		throw new AppError(404, "Emergency not found");
-	}
-
-	if (user.role === Role.REQUESTER && emergency.userId !== user.userId) {
-		throw new AppError(403, "You cannot cancel this emergency");
-	}
-
-	if (emergency.status === "CANCELLED" || emergency.status === "COMPLETED") {
-		throw new AppError(409, "Emergency cannot be cancelled");
-	}
-
-	const updatedEmergency = await prisma.emergencyRequest.updateMany({
-		where: {
-			id: emergencyId,
-			deletedAt: null,
-			status: emergency.status,
-		},
-		data: {
-			status: "CANCELLED",
-			cancelledAt: new Date(),
-		},
-	});
-
-	if (updatedEmergency.count === 0) {
-		throw new AppError(
-			409,
-			"Emergency could not be cancelled. It may have been processed or deleted.",
-		);
-	}
-
-	return await prisma.emergencyRequest.findFirstOrThrow({
-		where: {
-			id: emergencyId,
-			deletedAt: null,
-		},
-	});
+	return result;
 };
 
 //* Verify Emergency */

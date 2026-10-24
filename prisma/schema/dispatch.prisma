@@ -15,6 +15,7 @@ model Dispatch {
     arrivedAt   DateTime?
     completedAt DateTime?
     cancelledAt DateTime?
+    cancelReason String?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
