@@ -13,6 +13,11 @@ const createHospital = async (payload: IHospitalPayload) => {
 			OR: [{ email: email }, { phone: phone }],
 			deletedAt: null,
 		},
+		select: {
+			id: true,
+			email: true,
+			phone: true,
+		},
 	});
 
 	if (existingHospital) {
@@ -41,6 +46,9 @@ const getAllHospitals = async () => {
 	const hospitals = await prisma.hospital.findMany({
 		where: {
 			deletedAt: null,
+		},
+		orderBy: {
+			createdAt: "desc",
 		},
 	});
 
@@ -72,6 +80,10 @@ const updateHospital = async (
 			id: hospitalId,
 			deletedAt: null,
 		},
+		select: {
+			id: true,
+		},
+		
 	});
 
 	if (!hospital) {

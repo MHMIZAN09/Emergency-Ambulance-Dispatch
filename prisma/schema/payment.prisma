@@ -22,7 +22,7 @@ model Payment {
     cancelledAt DateTime?
 
     refundTrxId  String?
-    refundAmount Decimal?  @db.Decimal(12, 2)
+    refundAmount Decimal?  @db.Decimal(10, 2)
     refundReason String?
     refundedAt   DateTime?
 
