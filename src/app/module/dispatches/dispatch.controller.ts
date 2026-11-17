@@ -20,7 +20,7 @@ const createDispatch = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllDispatches = catchAsync(async (req: Request, res: Response) => {
-	const dispatches = await dispatchService.getAllDispatches();
+	const dispatches = await dispatchService.getAllDispatches(req.query);
 
 	sendResponse(res, {
 		statusCode: 200,

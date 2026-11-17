@@ -1,5 +1,7 @@
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
+import type { IQueryParams } from "../../types/query.types";
+import { PrismaQueryBuilder } from "../../utils/query-builder";
 import type {
 	IHospitalPayload,
 	IHospitalUpdatePayload,
@@ -42,17 +44,17 @@ const createHospital = async (payload: IHospitalPayload) => {
 	return hospital;
 };
 
-const getAllHospitals = async () => {
-	const hospitals = await prisma.hospital.findMany({
-		where: {
-			deletedAt: null,
-		},
-		orderBy: {
-			createdAt: "desc",
-		},
-	});
-
-	return hospitals;
+const getAllHospitals = async (query: IQueryParams) => {
+	return new PrismaQueryBuilder(query, {
+		searchableFields: ["name", "address", "phone", "email"],
+		filterableFields: ["status"],
+		sortableFields: ["createdAt", "updatedAt", "name", "status"],
+	})
+		.search()
+		.filter()
+		.sort()
+		.paginate()
+		.execute(prisma.hospital, { where: { deletedAt: null } });
 };
 
 const getHospitalById = async (hospitalId: string) => {
@@ -83,7 +85,6 @@ const updateHospital = async (
 		select: {
 			id: true,
 		},
-		
 	});
 
 	if (!hospital) {

@@ -1,11 +1,17 @@
 import type { Request, Response } from "express";
 import httpStatus from "http-status";
+import { AppError } from "../../utils/AppError";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import { UserService } from "./user.service";
 
 const updateUser = catchAsync(async (req: Request, res: Response) => {
 	const { id } = req.params;
+	const actor = req.user;
+
+	if (!actor || (actor.role !== "ADMIN" && actor.userId !== id)) {
+		throw new AppError(403, "You can only update your own profile");
+	}
 
 	const payload = req.body;
 
@@ -22,7 +28,7 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
 
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 	// Call the service to get all users
-	const result = await UserService.getAllUsers();
+	const result = await UserService.getAllUsers(req.query);
 
 	sendResponse(res, {
 		statusCode: httpStatus.OK,
@@ -61,7 +67,10 @@ const getUserById = catchAsync(async (req: Request, res: Response) => {
 const updateUserStatus = catchAsync(async (req: Request, res: Response) => {
 	const { id } = req.params;
 	const payload = req.body;
-	
+	if (req.user?.userId === id) {
+		throw new AppError(409, "You cannot change your own account status");
+	}
+
 	// Call the service to update the user status
 	const result = await UserService.updateUserStatus(id as string, payload);
 
@@ -76,7 +85,10 @@ const updateUserStatus = catchAsync(async (req: Request, res: Response) => {
 const updateUserRole = catchAsync(async (req: Request, res: Response) => {
 	const { id } = req.params;
 	const payload = req.body;
-	
+	if (req.user?.userId === id) {
+		throw new AppError(409, "You cannot change your own admin role");
+	}
+
 	// Call the service to update the user role
 	const result = await UserService.updateUserRole(id as string, payload);
 
@@ -88,11 +100,21 @@ const updateUserRole = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const deleteUser = catchAsync(async (req: Request, res: Response) => {
+	await UserService.deleteUser(
+		req.params.id as string,
+		req.user?.userId as string,
+	);
+
+	sendResponse(res, {
+		statusCode: httpStatus.OK,
+		success: true,
+		message: "User deleted successfully",
+		data: null,
+	});
+});
 
 const getProfileAnalytics = catchAsync(async (req: Request, res: Response) => {
-	const userId = req.user?.userId as string;
-	// const result = await UserService.getProfileAnalytics(userId);
-
 	sendResponse(res, {
 		statusCode: httpStatus.OK,
 		success: true,
@@ -101,8 +123,23 @@ const getProfileAnalytics = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const getDashboardAnalytics = catchAsync(
+	async (req: Request, res: Response) => {
+		const role = req.user?.role;
+		if (!role) {
+			throw new AppError(401, "Authentication is required");
+		}
 
+		const result = await UserService.getDashboardAnalytics(role);
 
+		sendResponse(res, {
+			statusCode: httpStatus.OK,
+			success: true,
+			message: "Dashboard analytics retrieved successfully",
+			data: result,
+		});
+	},
+);
 
 export const UserController = {
 	updateUser,
@@ -110,6 +147,8 @@ export const UserController = {
 	getUserById,
 	updateUserStatus,
 	updateUserRole,
+	deleteUser,
 	getProfile,
 	getProfileAnalytics,
+	getDashboardAnalytics,
 };

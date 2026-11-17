@@ -6,9 +6,9 @@ export interface IUserUpdatePayload {
 }
 
 export interface IUserStatusUpdatePayload {
-	status:UserStatus
+	status: UserStatus;
 }
 
 export interface IUserRoleUpdatePayload {
-	role:Role
+	role: Role;
 }

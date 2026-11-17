@@ -1,6 +1,8 @@
 import { AmbulanceStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
+import type { IQueryParams } from "../../types/query.types";
+import { PrismaQueryBuilder } from "../../utils/query-builder";
 import type {
 	IDriverAmbulancePayload,
 	IDriverPayload,
@@ -133,17 +135,20 @@ const createDriver = async (payload: IDriverPayload) => {
 	return driver;
 };
 
-const getAllDrivers = async () => {
-	const drivers = await prisma.driver.findMany({
-		where: {
-			deletedAt: null,
-		},
-		include: {
-			ambulance: true,
-		},
-	});
-
-	return drivers;
+const getAllDrivers = async (query: IQueryParams) => {
+	return new PrismaQueryBuilder(query, {
+		searchableFields: ["name", "email", "phone", "licenseNumber"],
+		sortableFields: ["createdAt", "updatedAt", "name", "email"],
+	})
+		.search()
+		.sort()
+		.paginate()
+		.execute(prisma.driver, {
+			where: { deletedAt: null },
+			include: {
+				ambulance: true,
+			},
+		});
 };
 
 const getDriverById = async (driverId: string) => {

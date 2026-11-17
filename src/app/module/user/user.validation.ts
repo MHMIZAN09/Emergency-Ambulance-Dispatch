@@ -26,13 +26,18 @@ const updateUserSchema = z.object({
 // }
 
 const updateUserStatusSchema = z.object({
-	status: z.enum(["ACTIVE", "INACTIVE", "SUSPENDED"], "Invalid status. Must be one of: ACTIVE, INACTIVE, SUSPENDED"),
-	});
+	status: z.enum(
+		["ACTIVE", "INACTIVE", "SUSPENDED"],
+		"Invalid status. Must be one of: ACTIVE, INACTIVE, SUSPENDED",
+	),
+});
 
 const updateUserRoleSchema = z.object({
-	role: z.enum(["ADMIN", "USER", "DRIVER"], "Invalid role. Must be one of: ADMIN, USER, DRIVER"),
-	});
-
+	role: z.enum(
+		["ADMIN", "REQUESTER", "DISPATCHER"],
+		"Invalid role. Must be one of: ADMIN, REQUESTER, DISPATCHER",
+	),
+});
 
 export const UserValidation = {
 	updateUserSchema,

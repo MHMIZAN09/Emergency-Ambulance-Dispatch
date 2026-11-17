@@ -24,7 +24,10 @@ const createEmergency = catchAsync(async (req: Request, res: Response) => {
 const getMyEmergencies = catchAsync(async (req: Request, res: Response) => {
 	const userId = req.user?.userId;
 
-	const result = await emergencyService.getMyEmergencies(userId as string);
+	const result = await emergencyService.getMyEmergencies(
+		userId as string,
+		req.query,
+	);
 
 	sendResponse(res, {
 		statusCode: 200,
@@ -35,7 +38,7 @@ const getMyEmergencies = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllEmergencies = catchAsync(async (req: Request, res: Response) => {
-	const result = await emergencyService.getAllEmergencies();
+	const result = await emergencyService.getAllEmergencies(req.query);
 
 	sendResponse(res, {
 		statusCode: 200,

@@ -4,6 +4,8 @@ import {
 } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
+import type { IQueryParams } from "../../types/query.types";
+import { PrismaQueryBuilder } from "../../utils/query-builder";
 import type {
 	IAmbulanceLocationPayload,
 	IAmbulancePayload,
@@ -54,27 +56,38 @@ const createAmbulance = async (payload: IAmbulancePayload) => {
 
 	return ambulance;
 };
-const getAllAmbulances = async () => {
-	const ambulances = await prisma.ambulance.findMany({
-		where: {
-			deletedAt: null,
-		},
-	});
-	return ambulances;
+const getAllAmbulances = async (query: IQueryParams) => {
+	return new PrismaQueryBuilder(query, {
+		searchableFields: ["licensePlate", "model", "manufacturer"],
+		filterableFields: ["status", "type"],
+		sortableFields: [
+			"createdAt",
+			"updatedAt",
+			"licensePlate",
+			"year",
+			"status",
+		],
+	})
+		.search()
+		.filter()
+		.sort()
+		.paginate()
+		.execute(prisma.ambulance, { where: { deletedAt: null } });
 };
 
-const getAvailableAmbulances = async () => {
-	const availableAmbulances = await prisma.ambulance.findMany({
-		where: {
-			status: AmbulanceStatus.AVAILABLE,
-			deletedAt: null,
-		},
-		orderBy: {
-			createdAt: "desc",
-		},
-	});
-
-	return availableAmbulances;
+const getAvailableAmbulances = async (query: IQueryParams) => {
+	return new PrismaQueryBuilder(query, {
+		searchableFields: ["licensePlate", "model", "manufacturer"],
+		filterableFields: ["type"],
+		sortableFields: ["createdAt", "updatedAt", "licensePlate", "year"],
+	})
+		.search()
+		.filter()
+		.sort()
+		.paginate()
+		.execute(prisma.ambulance, {
+			where: { status: AmbulanceStatus.AVAILABLE, deletedAt: null },
+		});
 };
 
 const getAmbulanceById = async (ambulanceId: string) => {

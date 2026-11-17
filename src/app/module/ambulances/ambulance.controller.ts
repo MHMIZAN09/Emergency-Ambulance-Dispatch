@@ -17,7 +17,7 @@ const createAmbulance = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllAmbulances = catchAsync(async (req: Request, res: Response) => {
-	const ambulances = await ambulanceService.getAllAmbulances();
+	const ambulances = await ambulanceService.getAllAmbulances(req.query);
 
 	sendResponse(res, {
 		statusCode: 200,
@@ -74,7 +74,7 @@ const deleteAmbulance = catchAsync(async (req: Request, res: Response) => {
 
 const getAvailableAmbulances = catchAsync(
 	async (req: Request, res: Response) => {
-		const ambulances = await ambulanceService.getAvailableAmbulances();
+		const ambulances = await ambulanceService.getAvailableAmbulances(req.query);
 
 		sendResponse(res, {
 			statusCode: 200,

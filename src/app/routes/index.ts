@@ -6,6 +6,7 @@ import { emergencyRouter } from "../module/emergencies/emergency.route";
 import { hospitalRouter } from "../module/hospitals/hospital.route";
 import { userRouter } from "../module/user/user.route";
 import { authRouter } from "./../module/auth/auth.routes";
+import { paymentRoutes } from "../module/payments/payment.route";
 
 const router = Router();
 router.use("/auth", authRouter);
@@ -15,5 +16,5 @@ router.use("/emergency", emergencyRouter);
 router.use("/dispatch", dispatchRouter);
 router.use("/driver", driverRouter);
 router.use("/hospital", hospitalRouter);
-
+router.use("/payment", paymentRoutes);
 export const appRouter = router;

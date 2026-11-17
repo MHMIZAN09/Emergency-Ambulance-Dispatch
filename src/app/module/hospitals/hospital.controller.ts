@@ -16,9 +16,8 @@ const createHospital = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
-//! Todo: Add pagination and filtering , sorting, limit
 const getAllHospitals = catchAsync(async (req: Request, res: Response) => {
-	const emergencies = await hospitalService.getAllHospitals();
+	const emergencies = await hospitalService.getAllHospitals(req.query);
 
 	sendResponse(res, {
 		statusCode: 200,

@@ -1,4 +1,3 @@
-/** biome-ignore-all assist/source/organizeImports: <explanation> */
 import { Router } from "express";
 import { Role } from "../../../generated/prisma/enums";
 import { auth } from "../../middleware/checkAuth";
@@ -33,9 +32,24 @@ router.patch(
 	UserController.updateUserRole,
 );
 
-router.get("/profile", auth(Role.ADMIN, Role.REQUESTER, Role.DISPATCHER), UserController.getProfile);
+router.delete("/admin/:id", auth(Role.ADMIN), UserController.deleteUser);
 
+router.get(
+	"/profile",
+	auth(Role.ADMIN, Role.REQUESTER, Role.DISPATCHER),
+	UserController.getProfile,
+);
 
-router.get("/me/analytics", auth(Role.REQUESTER,), UserController.getProfileAnalytics);
+router.get(
+	"/dashboard",
+	auth(Role.ADMIN, Role.DISPATCHER),
+	UserController.getDashboardAnalytics,
+);
+
+router.get(
+	"/me/analytics",
+	auth(Role.REQUESTER),
+	UserController.getProfileAnalytics,
+);
 
 export const userRouter = router;
