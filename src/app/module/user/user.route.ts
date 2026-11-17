@@ -18,6 +18,7 @@ router.patch(
 
 router.get("/admin/all", auth(Role.ADMIN), UserController.getAllUsers);
 router.get("/admin/:id", auth(Role.ADMIN), UserController.getUserById);
+
 router.patch(
 	"/admin/status/:id",
 	auth(Role.ADMIN),
@@ -31,5 +32,10 @@ router.patch(
 	validateRequest(UserValidation.updateUserRoleSchema),
 	UserController.updateUserRole,
 );
+
+router.get("/profile", auth(Role.ADMIN, Role.REQUESTER, Role.DISPATCHER), UserController.getProfile);
+
+
+router.get("/me/analytics", auth(Role.REQUESTER,), UserController.getProfileAnalytics);
 
 export const userRouter = router;

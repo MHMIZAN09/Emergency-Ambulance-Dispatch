@@ -32,6 +32,17 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const getProfile = catchAsync(async (req: Request, res: Response) => {
+	const userId = req.user?.userId as string;
+	const result = await UserService.getProfile(userId);
+
+	sendResponse(res, {
+		statusCode: httpStatus.OK,
+		success: true,
+		message: "User profile retrieved successfully",
+		data: result,
+	});
+});
 
 const getUserById = catchAsync(async (req: Request, res: Response) => {
 	const { id } = req.params;
@@ -78,10 +89,27 @@ const updateUserRole = catchAsync(async (req: Request, res: Response) => {
 });
 
 
+const getProfileAnalytics = catchAsync(async (req: Request, res: Response) => {
+	const userId = req.user?.userId as string;
+	// const result = await UserService.getProfileAnalytics(userId);
+
+	sendResponse(res, {
+		statusCode: httpStatus.OK,
+		success: true,
+		message: "User profile analytics retrieved successfully",
+		data: "",
+	});
+});
+
+
+
+
 export const UserController = {
 	updateUser,
 	getAllUsers,
 	getUserById,
 	updateUserStatus,
 	updateUserRole,
+	getProfile,
+	getProfileAnalytics,
 };

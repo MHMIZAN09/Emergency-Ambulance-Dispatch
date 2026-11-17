@@ -99,6 +99,25 @@ const updateUserRole = async (id: string, payload: IUserRoleUpdatePayload) => {
 	return updatedUser;
 };
 
+const getProfile = async (userId: string) => {
+	const user = await prisma.user.findFirst({
+		where: {
+			id: userId,
+			deletedAt: null,
+		},
+		omit: {
+			password: true,
+		},
+	});
+
+	if (!user) {
+		throw new Error("User not found");
+	}
+
+	return user;
+};
+
+
 
 export const UserService = {
 	updateUser,
@@ -106,4 +125,5 @@ export const UserService = {
 	getUserById,
 	updateUserStatus,
 	updateUserRole,
+	getProfile,
 };
